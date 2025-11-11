@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:todo/utils/my_button.dart';
 
 class DialogBox extends StatelessWidget {
+  final String title;
   final inputController;
   VoidCallback onSave;
   VoidCallback onCancel;
   DialogBox({super.key,
     required this.onSave,
     required this.onCancel,
-    this.inputController
+    this.inputController,
+    required this.title
   });
 
   @override
@@ -19,10 +21,14 @@ class DialogBox extends StatelessWidget {
       ),
       backgroundColor: Colors.green[100],
       content: SizedBox(
-        height: 120,
+        height: 152,
         width: double.infinity,
         child: Column(
           children: [
+            //title
+            Text(title, style: TextStyle(fontSize: 18),),
+            //gap
+            SizedBox(height: 12,),
             //user input
             TextField(
               autofocus: true,

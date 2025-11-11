@@ -6,11 +6,13 @@ class TodoList extends StatelessWidget {
   final bool isDone;
   final Function(bool?) onChanged;
   final Function(BuildContext)? deleteFunction;
+  final Function(BuildContext)? editFunction;
   const TodoList({super.key,
     required this.taskName,
     required this.isDone,
     required this.deleteFunction,
-    required this.onChanged
+    required this.onChanged,
+    required this.editFunction
   });
 
   @override
@@ -43,7 +45,18 @@ class TodoList extends StatelessWidget {
             children: [
               Checkbox(value: isDone, onChanged: onChanged, activeColor: Colors.black,shape: CircleBorder(),),
               //task name
-              Text(taskName, style: TextStyle(decoration: isDone ? TextDecoration.lineThrough : TextDecoration.none, fontSize: 17),),
+              Expanded(
+                  child: Text(
+                    taskName,
+                    style: TextStyle(
+                        decoration: isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                        fontSize: 17),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: false,
+                  )
+              ),
+              IconButton(onPressed: () => editFunction?.call(context), icon: Icon(Icons.edit))
             ],
           ),
         ),

@@ -32,11 +32,22 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       db.toDoList.removeAt(index);
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text("Task Removed!"),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.fixed,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        duration: const Duration(seconds: 2),
+        dismissDirection: DismissDirection.startToEnd,
+      ),
+    );
   }
   //add task
   void addNewTask(){
     showDialog(context: context, builder: (context) {
       return DialogBox(
+        title: "",
         onCancel: Navigator.of(context).pop,
         onSave: saveTask,
       );
@@ -49,6 +60,7 @@ class _HomePageState extends State<HomePage> {
     if (text.isEmpty) {
       //
       showDialog(
+        barrierDismissible: true,
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -91,7 +103,7 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
     Navigator.of(context).pop();
 
-    //
+    //show snack bar messenger
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text("Task added successfully ✅"),
@@ -112,12 +124,37 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
   //create new task
-  void createTask(){
-    showDialog(context: context, builder: (context) {
+  void createTask() async{
+    await showDialog(context: context, builder: (context) {
       return DialogBox(
+        title: "Add New Task",
         onSave: saveTask,
-        onCancel: () => Navigator.of(context).pop(),
+        onCancel: () {
+          Navigator.of(context).pop();
+          _controller.clear();
+        },
         inputController: _controller,);
+    });
+    _controller.clear();
+  }
+
+  //edit task function
+  void editTask(index){
+    final editController = TextEditingController(text: db.toDoList[index][0]);
+
+    showDialog(context: context, builder: (context) {
+      return  DialogBox(
+          title: "Edit Task",
+          inputController:editController,
+          onSave: () {
+            setState(() {
+              db.toDoList[index][0] = editController.text.trim();
+            });
+            db.updateDatabase();
+            Navigator.of(context).pop();
+          },
+          onCancel: () => Navigator.of(context).pop(),
+      );
     });
   }
   @override
@@ -140,7 +177,8 @@ class _HomePageState extends State<HomePage> {
                 taskName: db.toDoList[index][0],
                 isDone: db.toDoList[index][1],
                 deleteFunction: (context) => deleteTask(index),
-                onChanged: (value) => checkBoxChange(value, index)
+                onChanged: (value) => checkBoxChange(value, index),
+                editFunction: (context) => editTask(index)
             );
           },
         ),
